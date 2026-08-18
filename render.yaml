@@ -1,0 +1,23 @@
+# Render Blueprint for LinuxPath Backend API
+services:
+  - type: web
+    name: linuxpath-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile.render
+    dockerContext: ./backend
+    region: oregon
+    plan: free
+    healthCheckPath: /api/v1/courses
+    envVars:
+      - key: APP_NAME
+        value: LinuxPath
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: DB_CONNECTION
+        value: sqlite

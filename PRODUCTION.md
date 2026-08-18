@@ -4,10 +4,17 @@ Esta guía documenta la puesta en marcha en entorno de producción del ecosistem
 
 ---
 
-## 1. Backend (Laravel 12 API con Docker y Swagger UI)
+## 🚀 Despliegue en PaaS Cloud (Render.com)
+
+Si deseas realizar un despliegue inmediato en la nube sin administrar servidores VPS, consulta la guía dedicada:
+👉 **[`RENDER_DEPLOY.md`](file:///c:/Users/ngrok/Downloads/LinuxPath/LinuxPath/RENDER_DEPLOY.md)** (Despliegue 1-Click con Render Blueprints).
+
+---
+
+## 1. Backend (Laravel 12 API con Docker Compose en VPS)
 
 ### Requisitos del Servidor
-- Servidor VPS (Ubuntu 22.04 LTS o superior recomendado)
+- Servidor VPS (Ubuntu 24.04 / 22.04 LTS o Debian 12 recomendado)
 - Docker v24+ y Docker Compose v2.20+
 - Nombre de Dominio apuntando al servidor con certificado SSL/TLS (HTTPS).
 
