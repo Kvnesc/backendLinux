@@ -1,0 +1,439 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "LinuxPath API",
+    "description": "API RESTful para la plataforma educativa móvil LinuxPath (Laravel 12). Proporciona autenticación Bearer Token, cursos, módulos, lecciones, evaluación de ejercicios de comandos Linux y seguimiento del progreso del usuario.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "LinuxPath Team",
+      "email": "support@linuxpath.local"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Servidor API v1"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Registro de Usuario",
+        "description": "Crea una nueva cuenta de usuario y retorna el token Sanctum de acceso.",
+        "tags": ["Autenticación"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario registrado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error de validación (ej. email ya registrado)"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Inicio de Sesión",
+        "description": "Autentica al usuario con sus credenciales y genera un Bearer Token.",
+        "tags": ["Autenticación"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesión iniciada correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Credenciales inválidas"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Cerrar Sesión",
+        "description": "Revoca el token de acceso actual del usuario autenticado.",
+        "tags": ["Autenticación"],
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sesión cerrada correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Sesión cerrada exitosamente." }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "summary": "Perfil del Usuario Authenticado",
+        "description": "Obtiene la información del perfil del usuario actual.",
+        "tags": ["Autenticación"],
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Datos del perfil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          }
+        }
+      }
+    },
+    "/courses": {
+      "get": {
+        "summary": "Listar Cursos",
+        "description": "Obtiene la lista completa de cursos ordenados por nivel con sus módulos.",
+        "tags": ["Cursos"],
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de cursos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          }
+        }
+      }
+    },
+    "/courses/{slug}": {
+      "get": {
+        "summary": "Detalle de Curso",
+        "description": "Obtiene la estructura detallada de un curso según su slug.",
+        "tags": ["Cursos"],
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Slug identificador del curso (ej. linux-basico)",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle del curso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Course"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Curso no encontrado"
+          }
+        }
+      }
+    },
+    "/lessons/{id}": {
+      "get": {
+        "summary": "Detalle de Lección",
+        "description": "Obtiene el contenido teórico y los ejercicios asociados a una lección.",
+        "tags": ["Lecciones"],
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID numérico de la lección",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle de la lección y sus ejercicios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Lección no encontrada"
+          }
+        }
+      }
+    },
+    "/lessons/{id}/complete": {
+      "post": {
+        "summary": "Marcar Lección como Completada",
+        "description": "Marca manualmente una lección como completada por el usuario.",
+        "tags": ["Lecciones"],
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID numérico de la lección",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lección completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Lección completada." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/exercises/{id}/attempt": {
+      "post": {
+        "summary": "Intentar Resolver Ejercicio",
+        "description": "Evalúa el comando Linux ingresado por el usuario contra la respuesta esperada.",
+        "tags": ["Ejercicios"],
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID numérico del ejercicio",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["answer"],
+                "properties": {
+                  "answer": { "type": "string", "example": "ls -la" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado de la evaluación del comando",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/progress": {
+      "get": {
+        "summary": "Progreso General del Usuario",
+        "description": "Retorna el avance en porcentaje de cada curso para el usuario autenticado.",
+        "tags": ["Progreso"],
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reporte de progreso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Sanctum Token"
+      }
+    },
+    "schemas": {
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["name", "email", "password", "password_confirmation"],
+        "properties": {
+          "name": { "type": "string", "example": "Juan Pérez" },
+          "email": { "type": "string", "format": "email", "example": "juan@example.com" },
+          "password": { "type": "string", "format": "password", "example": "password123" },
+          "password_confirmation": { "type": "string", "format": "password", "example": "password123" }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email", "example": "demo@linuxpath.local" },
+          "password": { "type": "string", "format": "password", "example": "password" }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "user": { "$ref": "#/components/schemas/User" },
+          "token": { "type": "string", "example": "1|qX8z9aBC..." }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "name": { "type": "string", "example": "Demo User" },
+          "email": { "type": "string", "example": "demo@linuxpath.local" }
+        }
+      },
+      "Course": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "slug": { "type": "string", "example": "linux-basico" },
+          "title": { "type": "string", "example": "Fundamentos de Linux" },
+          "description": { "type": "string", "example": "Aprende los comandos esenciales del shell" },
+          "level": { "type": "string", "example": "principiante" },
+          "order": { "type": "integer", "example": 1 }
+        }
+      },
+      "LessonDetail": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "title": { "type": "string", "example": "Navegación por el Sistema de Archivos" },
+          "content": { "type": "string", "example": "El comando cd permite cambiar de directorio..." },
+          "command_example": { "type": "string", "example": "cd /var/log" },
+          "estimated_minutes": { "type": "integer", "example": 15 },
+          "completed": { "type": "boolean", "example": false },
+          "exercises": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer", "example": 1 },
+                "type": { "type": "string", "example": "command" },
+                "prompt": { "type": "string", "example": "Muestra el directorio actual de trabajo" },
+                "hint": { "type": "string", "example": "Usa pwd" }
+              }
+            }
+          }
+        }
+      },
+      "AttemptResponse": {
+        "type": "object",
+        "properties": {
+          "correct": { "type": "boolean", "example": true },
+          "message": { "type": "string", "example": "Respuesta correcta." },
+          "explanation": { "type": "string", "example": "pwd imprime el directorio actual." },
+          "lesson_completed": { "type": "boolean", "example": true }
+        }
+      },
+      "ProgressResponse": {
+        "type": "object",
+        "properties": {
+          "courses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "course_id": { "type": "integer", "example": 1 },
+                "course_title": { "type": "string", "example": "Fundamentos de Linux" },
+                "completed_lessons": { "type": "integer", "example": 3 },
+                "total_lessons": { "type": "integer", "example": 10 },
+                "progress_percent": { "type": "number", "example": 30.0 }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

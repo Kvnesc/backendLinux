@@ -1,0 +1,11 @@
+<resources>
+    <color name="forest">#1F5D42</color>
+    <color name="forest_dark">#163F2F</color>
+    <color name="surface">#F5F7F5</color>
+    <color name="surface_card">#FFFFFF</color>
+    <color name="text_primary">#162019</color>
+    <color name="text_secondary">#5D685F</color>
+    <color name="terminal">#111713</color>
+    <color name="terminal_text">#C7F4D7</color>
+    <color name="danger">#B3261E</color>
+</resources>
