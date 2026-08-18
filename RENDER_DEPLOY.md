@@ -23,8 +23,8 @@ Si prefieres configurar el servicio manualmente en el Dashboard de Render:
 3. Ajusta los siguientes campos:
    - **Name:** `linuxpath-backend`
    - **Environment:** `Docker`
-   - **Dockerfile Path:** `./backend/Dockerfile.render`
-   - **Docker Build Context Path:** `./backend`
+   - **Dockerfile Path:** `./Dockerfile.render`
+   - **Docker Build Context Path:** `.`
 4. En **Environment Variables**, agrega las siguientes variables:
    - `APP_ENV`: `production`
    - `APP_DEBUG`: `false`
@@ -41,15 +41,4 @@ Una vez completado el despliegue (suele tardar de 2 a 3 minutos), Render te prop
 
 Prueba los siguientes enlaces en tu navegador:
 - **Documentación Swagger UI:** `https://linuxpath-backend.onrender.com/docs/index.html`
-- **Lista de Cursos API:** `https://linuxpath-backend.onrender.com/api/v1/courses` *(Requiere Bearer Token o puedes probar el registro/login desde Swagger)*.
-
----
-
-## Conectar la App Android al Backend en Render
-
-En tu proyecto Android, compila especificando la URL pública de Render:
-
-```bash
-cd android
-./gradlew assembleRelease -PAPI_BASE_URL=https://linuxpath-backend.onrender.com/api/v1/
-```
+- **Lista de Cursos API:** `https://linuxpath-backend.onrender.com/api/v1/courses`

@@ -1,121 +1,62 @@
-# LinuxPath
+# LinuxPath Backend API — Laravel 12
 
-Aplicación Android nativa para aprender Linux desde cero hasta un nivel profesional, con backend API en Laravel 12.
+API RESTful desarrollada en **Laravel 12 (Estable)** para la plataforma de aprendizaje **LinuxPath**.
 
-## Stack elegido
+---
 
-### Android
-- Kotlin 2.3.20
-- Android Views/XML (sin Compose para reducir dependencias y tamaño)
-- AppCompat
-- RecyclerView
-- Lifecycle / coroutines
-- Retrofit 3 + Gson
-- SharedPreferences para el token (sin DataStore/Hilt/Room para mantener el cliente ligero)
-- compileSdk 36 / targetSdk 36 / minSdk 23
+## ⚡ Stack Tecnológico
 
-### Backend
-- **Laravel 12** (versión estable de producción actual)
-- Documentación OpenAPI 3.0 & **Swagger UI** interactivo en `/docs`
-- Laravel Sanctum para autenticación móvil por Bearer Token
-- Eloquent ORM
-- SQLite por defecto
-- MySQL listo para activarse cambiando solamente `.env`
+- **Framework:** Laravel 12
+- **Autenticación:** Laravel Sanctum (Bearer Token)
+- **Documentación API:** OpenAPI 3.0 & **Swagger UI** interactivo en `/docs`
+- **Base de Datos:** SQLite (por defecto en dev/PaaS) / MySQL 8.0 (con Docker Compose)
+- **Despliegue Cloud:** Docker / Render.com (`render.yaml`) / Nginx + FPM
 
-## Funciones incluidas
+---
 
-- Registro e inicio de sesión.
-- Ruta de aprendizaje ordenada por nivel.
-- Cursos, módulos y lecciones.
-- Ejercicios de comandos Linux/Bash.
-- Validación de respuestas en el backend.
-- Progreso por lección y curso.
-- Documentación OpenAPI 3.0 & Swagger UI.
-- API versionada en `/api/v1`.
-
-## Estructura
-
-```text
-LinuxPath/
-├── android/    # App Android Kotlin
-└── backend/    # API Laravel 12 con Swagger UI
-```
-
-## Inicio rápido del backend
+## 🚀 Inicio Rápido en Desarrollo Local
 
 ```bash
-cd backend
 cp .env.example .env
 composer install
 php artisan key:generate
+touch database/database.sqlite
 php artisan migrate --seed
 php artisan serve --host=0.0.0.0 --port=8000
 ```
 
-Cuenta de demostración creada por el seeder:
-
+### Cuenta de Demostración
 ```text
-email: demo@linuxpath.local
-password: password
+Email:    demo@linuxpath.local
+Password: password
 ```
 
-## Android
+---
 
-Abre `android/` con Android Studio.
+## 📚 Documentación Interactiva Swagger UI
 
-El emulador Android usa por defecto:
+Al iniciar el servidor, accede en el navegador a:
 
-```text
-http://10.0.2.2:8000/api/v1/
-```
+👉 **`http://localhost:8000/docs/index.html`**
 
-Para un teléfono físico usa la IP LAN de tu servidor. Puedes fijarla en Android Studio como propiedad Gradle `API_BASE_URL`, por ejemplo:
+O consulta el esquema OpenAPI 3.0 JSON en:
 
-```text
-http://192.168.1.50:8000/api/v1/
-```
+👉 **`http://localhost:8000/swagger.json`**
 
-Para producción usa una URL HTTPS, por ejemplo:
+---
 
-```text
-https://api.tudominio.cl/api/v1/
-```
+## 🌐 Despliegue en Render.com (1-Click)
 
-El proyecto incluye `gradle-wrapper.properties`, pero no distribuye `gradle-wrapper.jar` ni binarios de terceros. Android Studio puede sincronizar el proyecto usando Gradle 8.13. Si quieres compilar exclusivamente desde terminal, genera una vez el wrapper desde una instalación local de Gradle:
+Este repositorio incluye soporte nativo para **Render Blueprints**:
+1. Conecta este repositorio en [Render.com](https://render.com).
+2. Render utilizará automaticamente [`render.yaml`](file:///c:/Users/ngrok/Downloads/LinuxPath/LinuxPath/render.yaml) y [`Dockerfile.render`](file:///c:/Users/ngrok/Downloads/LinuxPath/LinuxPath/Dockerfile.render).
+
+Para instrucciones detalladas consulta la guía [`RENDER_DEPLOY.md`](file:///c:/Users/ngrok/Downloads/LinuxPath/LinuxPath/RENDER_DEPLOY.md).
+
+---
+
+## 🧪 Pruebas Automatizadas
 
 ```bash
-cd android
-gradle wrapper --gradle-version 8.13
-./gradlew assembleDebug -PAPI_BASE_URL=http://192.168.1.50:8000/api/v1/
+php artisan test
 ```
-
-## Cambiar SQLite a MySQL
-
-No debes cambiar controladores, modelos ni repositorios. Solo el `.env` del backend.
-
-SQLite:
-
-```env
-DB_CONNECTION=sqlite
-# DB_DATABASE=/ruta/absoluta/al/proyecto/database/database.sqlite
-```
-
-MySQL:
-
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=linuxpath
-DB_USERNAME=linuxpath
-DB_PASSWORD=tu_clave
-```
-
-Luego ejecuta:
-
-```bash
-php artisan config:clear
-php artisan migrate
-```
-
-Si vas a mover datos existentes desde SQLite a MySQL, la estructura ya es portable, pero debes migrar los datos con un dump/script ETL; cambiar el `.env` no copia automáticamente los registros.
